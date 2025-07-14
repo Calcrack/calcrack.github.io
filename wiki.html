@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiki del Servidor de Minecraft</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Estilos Generales y Tema Oscuro --- */
+        :root {
+            --color-fondo: #1e1e2e;
+            --color-superficie: #28283a;
+            --color-borde: #44475a;
+            --color-texto-principal: #f8f8f2;
+            --color-texto-secundario: #bd93f9;
+            --color-acento-1: #50fa7b;
+            --color-acento-2: #8be9fd;
+            --color-resaltado: #ffb86c;
+            --fuente-pixel: 'Press Start 2P', cursive;
+            --fuente-cuerpo: 'Roboto', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--fuente-cuerpo);
+            background-color: var(--color-fondo);
+            color: var(--color-texto-principal);
+            line-height: 1.7;
+            padding: 20px;
+        }
+
+        /* --- Contenedor Principal de la Wiki --- */
+        .wiki-container {
+            display: flex;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* --- Barra de Navegación Lateral (Fija) --- */
+        .wiki-nav {
+            flex: 0 0 280px; /* No crece, no se encoge, base de 280px */
+            position: sticky;
+            top: 20px;
+            align-self: flex-start; /* Se alinea arriba */
+            height: calc(100vh - 40px);
+            overflow-y: auto;
+            padding-right: 15px;
+        }
+
+        .wiki-nav h2 {
+            font-family: var(--fuente-pixel);
+            font-size: 1.1em;
+            color: var(--color-acento-2);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--color-borde);
+        }
+
+        .wiki-nav ul {
+            list-style: none;
+        }
+
+        .wiki-nav a {
+            display: block;
+            padding: 10px 15px;
+            color: var(--color-texto-secundario);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.3s, color 0.3s;
+            margin-bottom: 5px;
+        }
+
+        .wiki-nav a:hover,
+        .wiki-nav a:focus {
+            background-color: var(--color-borde);
+            color: var(--color-texto-principal);
+        }
+
+        /* --- Área de Contenido Principal --- */
+        .wiki-content {
+            flex: 1; /* Ocupa el espacio restante */
+        }
+
+        header.wiki-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%2328283a"/><path d="M0 50 L50 0 L100 50 L50 100 Z" fill="%2344475a" fill-opacity="0.1"/></svg>');
+            border-radius: 12px;
+            border: 1px solid var(--color-borde);
+        }
+
+        header.wiki-header h1 {
+            font-family: var(--fuente-pixel);
+            color: var(--color-acento-1);
+            font-size: 2em;
+            text-shadow: 2px 2px #000;
+        }
+
+        /* --- Estilo de cada Sección (Tarjeta) --- */
+        .wiki-section {
+            background-color: var(--color-superficie);
+            border: 1px solid var(--color-borde);
+            border-radius: 12px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            scroll-margin-top: 20px; /* Espacio para que el título no quede pegado arriba al navegar */
+        }
+
+        .wiki-section h2 {
+            font-family: var(--fuente-pixel);
+            font-size: 1.5em;
+            color: var(--color-acento-2);
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--color-borde);
+        }
+
+        .wiki-section h3 {
+            font-family: var(--fuente-cuerpo);
+            font-weight: 700;
+            font-size: 1.3em;
+            color: var(--color-resaltado);
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .wiki-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .wiki-section li {
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .wiki-section li::before {
+            content: '❖'; /* Un icono simple y elegante */
+            position: absolute;
+            left: 0;
+            top: 1px;
+            color: var(--color-acento-1);
+            font-size: 1em;
+        }
+
+        .wiki-section ul ul { /* Para listas anidadas */
+            margin-top: 10px;
+            margin-left: 20px;
+        }
+
+        .wiki-section ul ul li::before {
+            content: '»';
+            color: var(--color-resaltado);
+        }
+
+        strong {
+            color: var(--color-acento-2);
+            font-weight: 700;
+        }
+
+        code {
+            background-color: var(--color-borde);
+            color: var(--color-resaltado);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+/* --- [NUEVO] ESTILOS PARA IMAGEN DESPLEGABLE --- */
+        .collapsible-container {
+            margin: 15px 0;
+        }
+
+        .collapsible-trigger {
+            background-color: var(--color-borde);
+            color: var(--color-texto-principal);
+            cursor: pointer;
+            padding: 10px 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 1em;
+            font-family: var(--fuente-cuerpo);
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .collapsible-trigger:hover {
+            background-color: #5a5c72; /* Un poco más claro que el borde */
+        }
+
+        .collapsible-trigger::after {
+            content: ' (Mostrar ▼)';
+            font-size: 0.9em;
+            color: var(--color-acento-1);
+            float: right;
+        }
+
+        .collapsible-trigger.active::after {
+            content: ' (Ocultar ▲)';
+        }
+
+        .collapsible-content {
+            padding: 0 18px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background-color: transparent;
+        }
+        
+        .collapsible-content img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 15px;
+            border-radius: 8px;
+            border: 2px solid var(--color-borde);
+        }
+
+        /* --- Scrollbar Personalizada --- */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--color-fondo);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-borde);
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* --- Diseño Responsivo para Móviles --- */
+        @media (max-width: 1024px) {
+            .wiki-container {
+                flex-direction: column;
+            }
+            .wiki-nav {
+                position: static;
+                height: auto;
+                overflow-y: visible;
+                margin-bottom: 30px;
+                flex-basis: auto;
+            }
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            header.wiki-header h1 {
+                font-size: 1.5em;
+            }
+            .wiki-section h2 {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wiki-container">
+        <!-- BARRA DE NAVEGACIÓN -->
+        <nav class="wiki-nav">
+            <h2>Índice Rápido</h2>
+            <ul>
+                <li><a href="#mod-diversity">📖 Mod: Diversity</a></li>
+                <li><a href="#datapack-tool-trims">🎨 Datapack: Diseños de Herramientas</a></li>
+                <li><a href="#datapack-crops-rain">🌧️ Datapack: Los Cultivos Aman la Lluvia</a></li>
+                <li><a href="#datapack-armor-effects">✨ Datapack: Efectos de Diseños de Armadura</a></li>
+                <li><a href="#datapack-pale-garden">🌳 Datapack: El Jardín Pálido</a></li>
+                <li><a href="#datapack-fishing-loot">🎣 Datapack: Botín de Pesca por Bioma</a></li>
+                <li><a href="#datapack-useful-animals">🐖 Datapack: Animales Útiles</a></li>
+                <li><a href="#datapack-allay-upgrades">💎 Datapack: Mejoras de Allays</a></li>
+                <li><a href="#datapack-progressive-eyes">👁️ Datapack: Ojos Progresivos de Ranold</a></li>
+                <li><a href="#datapack-wandering-illusioner">🎭 Datapack: Ilusionista Ambulante</a></li>
+                <li><a href="#datapack-upgraded-mobs">👾 Datapack: Mobs Mejorados</a></li>
+                <li><a href="#datapack-coals-gunpowder">🔥 Datapack: Carbón a Pólvora</a></li>
+                <li><a href="#datapack-mob-tweaks">🐾 Datapack: Ajustes de Mobs Adicionales</a></li>
+                <li><a href="#datapack-custom-arrows">🏹 Datapack: Flechas y Arcos Personalizados</a></li>
+            </ul>
+        </nav>
+
+        <!-- CONTENIDO PRINCIPAL DE LA WIKI -->
+        <main class="wiki-content">
+            <header class="wiki-header">
+                <h1>Wiki de Mecánicas del Servidor</h1>
+                <p>Una guía de todas las mecánicas, cambios y añadidos que encontrarás en el servidor.</p>
+            </header>
+
+            <!-- Sección Mod: Diversity -->
+            <section id="mod-diversity" class="wiki-section">
+                <h2>📖 Mod: Diversity</h2>
+                <p>Este mod añade una gran variedad de mejoras y nuevas funcionalidades.</p>
+
+                <h3>Mejoras de Calidad de Vida y Generales</h3>
+                <ul>
+                    <li><strong>Recetas Adicionales:</strong> Se añaden recetas para fabricar el Saco (Bundle) y la Arena/Grava Sospechosa.</li>
+		    <div class="collapsible-container">
+                            <button type="button" class="collapsible-trigger">Ver Receta de Crafteo</button>
+                            <div class="collapsible-content">
+                                <!-- He usado una imagen Base64 para que el archivo sea autocontenido -->
+                                <img src="https://cdn.modrinth.com/data/31qnTHav/images/1d8562d28dc87deacbc2289744386fa0fa978bb6.png" alt="Receta de crafteo del Arco de Poder de Élite">
+                            </div>
+                        </div>
+                    <li><strong>Bombillas de Cobre más Rápidas (Solo 1.21):</strong> Las bombillas de cobre tienen un retardo de 1 tick.</li>
+                    <li><strong>Encantamientos de Respaldo:</strong> Versiones más débiles de los encantamientos de protección (25% de la potencia original).</li>
+                    <li><strong>Polvo de Hueso en Corales:</strong> Úsalo en corales en biomas de océano cálido para hacer crecer un arrecife.</li>
+                    <li><strong>Polvo de Hueso en Flores Pequeñas:</strong> Fertiliza flores pequeñas en micelio para expandirlas.</li>
+                    <li><strong>Faros Extendidos:</strong> El alcance y duración del faro se pueden extender hasta el nivel 10.</li>
+                    <li><strong>Estandartes de Trofeo:</strong> Obtenlos al derrotar jefes o como regalo de Pastores con "Héroe de la Aldea".</li>
+                    <li><strong>Contador de Días:</strong> Muestra los días transcurridos en el mundo.</li>
+                    <li><strong>Generador de Pizarra Profunda:</strong> Se genera cuando lava y agua se juntan por debajo de Y=8.</li>
+                    <li><strong>Marcos de Objetos Invisibles:</strong> Shift + clic derecho con un panel de cristal en un marco.</li>
+                    <li><strong>Oxidación Rápida del Cobre:</strong> Se oxida más rápido bajo la lluvia o en el agua.</li>
+                    <li><strong>Vagonetas más Rápidas:</strong> Viajan más rápido sobre raíles colocados en bloques de Grava.</li>
+                    <li><strong>Efecto de las Bayas Luminosas:</strong> Comerlas otorga el efecto de Brillo (Glow).</li>
+                    <li><strong>Etiquetas en Cajas de Shulker:</strong> El nombre personalizado flota sobre la caja de shulker colocada.</li>
+                    <li><strong>Rellenar Arena/Grava Sospechosa:</strong> Shift + clic derecho para añadir objetos a bloques sospechosos vacíos.</li>
+                    <li><strong>Sin Límite en Yunques:</strong> Se elimina la limitación de "Demasiado caro".</li>
+                    <li><strong>No Pisotear Cultivos:</strong> Si llevas botas con Caída de Pluma o tienes el efecto de Caída Lenta.</li>
+                    <li><strong>Experiencia de los Cultivos:</strong> Ganas XP al recolectar cultivos.</li>
+                    <li><strong>Dormir sin Cambiar Spawn:</strong> Shift + clic derecho en una cama.</li>
+                    <li><strong>Antorchas que Queman:</strong> Golpear a una entidad con una antorcha la prenderá fuego.</li>
+                    <li><strong>El Clima no se Salta al Dormir:</strong> Dormir ya no despejará la lluvia o tormenta.</li>
+                    <li><strong>Lavar Mapas Llenos:</strong> Limpia mapas explorados en un caldero con agua.</li>
+                    <li><strong>Agacharse en Zarzas:</strong> Evita el daño de los arbustos de bayas dulces al agacharte.</li>
+                    <li><strong>Pantalones contra las Zarzas:</strong> Llevar pantalones te protege del daño de las zarzas.</li>
+                    <li><strong>Minería Rápida de Cristal:</strong> Los picos minan cristal, variantes y piedra luminosa más rápido.</li>
+                    <li><strong>Cuadro de los 4 Elementos:</strong> Se puede colocar en supervivencia.</li>
+                    <li><strong>Esponjas que se Secan Solas:</strong> Las esponjas mojadas se secan en biomas cálidos.</li>
+                    <li><strong>Caña de Azúcar en Barro:</strong> Puede crecer en Barro y Raíces de Mangle Fangosas sin agua cerca.</li>
+                </ul>
+
+                <h3>Ajustes de Objetos</h3>
+                <ul>
+                    <li><strong>Encantamientos para el Saco (Bundle):</strong>
+                        <ul>
+                            <li><code>Vacuum</code>: Absorbe automáticamente nuevos objetos del suelo.</li>
+                            <li><code>Selective Vacuum</code>: Solo absorbe objetos del mismo tipo que ya hay en el saco.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Colocar Bloques con el Saco:</strong> Shift + clic izquierdo en el suelo para entrar en "modo de colocación".</li>
+                    <li><strong>Azadas de Cosecha Múltiple:</strong> Cosechan un área de cultivos (3x3 por defecto, 5x5 para diamante/netherita).</li>
+                    <li><strong>Mazo para Rotar Bloques (Solo 1.21):</strong> Agachado + clic derecho para rotar bloques orientables.</li>
+                    <li><strong>Tijeras para Desactivar TNT:</strong> Úsalas en una TNT encendida para intentar desactivarla.</li>
+                    <li><strong>Robar a Aldeanos con Tijeras:</strong>
+                        <ul>
+                            <li>Alta probabilidad de enfado si lo haces por delante.</li>
+                            <li>Menor riesgo si lo haces por la espalda.</li>
+                            <li>El riesgo se anula con poción de invisibilidad.</li>
+                            <li>Puede reiniciar la profesión del aldeano.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Tijeras para Detener el Crecimiento:</strong> Úsalas en brotes, bambú, enredaderas o caña de azúcar.</li>
+                    <li><strong>Catalejo "¿Qué es eso?":</strong> Muestra información adicional de bloques o entidades a distancia.</li>
+                    <li><strong>Detector de Chunks de Slimes:</strong> Sostener un objeto con la etiqueta <code>diversity:slime_detector</code> emite partículas en un chunk de slimes.</li>
+                    <li><strong>Tridente para Invocar Tormentas:</strong> Lanza un tridente con Conductividad al cielo en la altura máxima para invocar una tormenta.</li>
+                    <li><strong>El Reloj Muestra la Hora:</strong> Usar el reloj en la mano muestra la hora del mundo.</li>
+                    <li><strong>El Reloj Muestra Horarios de Aldeanos:</strong> Clic derecho en una mesa de trabajo de aldeano con un reloj.</li>
+                    <li><strong>Detector de Bloques Encerados:</strong> Los bloques de cobre encerados emiten partículas al mirarlos con catalejo agachado.</li>
+                </ul>
+
+                <h3>Ajustes de Mobs y Comportamientos</h3>
+                <ul>
+                    <li><strong>Gato con 9 Vidas:</strong> Los gatos tienen 9 vidas.</li>
+                    <li><strong>Etiquetas de Nombre Silenciosas:</strong> Renombrar un mob con "silent" o "shutup" lo silencia.</li>
+                    <li><strong>Etiquetas de Nombre de Bebé:</strong> Renombrar un animal bebé con "baby" evita que crezca.</li>
+                    <li><strong>Cepillar Loros y Pollos:</strong> Usa un cepillo para que suelten plumas.</li>
+                    <li><strong>Sniffer Explosivo:</strong> Clic derecho con pólvora, polvo de blaze, azúcar, redstone o glowstone sobre un Sniffer para que explote.</li>
+                    <li><strong>Las Cabras Dropean Lana y Cordero:</strong> Ahora sueltan estos ítems al morir.</li>
+                    <li><strong>Sniffer en Bloques de Musgo:</strong> Si olfatea en musgo, soltará esporas en flor o pequeñas drupas.</li>
+                    <li><strong>Acaricia a tu Mascota:</strong> Shift + clic derecho en tus mascotas para acariciarlas.</li>
+                    <li><strong>Zorros que Entierran Objetos:</strong> Pueden enterrar objetos en arena o grava.</li>
+                    <li><strong>Zorros que se Reproducen Solos:</strong> Se reproducen automáticamente tras comer bayas.</li>
+                    <li><strong>Abejas más Pequeñas (Solo 1.21):</strong> Son la mitad de su tamaño normal.</li>
+                    <li><strong>Peces y Calamares de Tamaño Aleatorio (Solo 1.21):</strong> Aparecen en tamaños aleatorios.</li>
+                    <li><strong>Piglins y Armaduras con Oro:</strong> Tratan las armaduras con adornos de oro como si fueran de oro.</li>
+                    <li><strong>Monturas Domadas no se Mueven:</strong> Animales con silla de montar no se mueven de su sitio.</li>
+                    <li><strong>Caballos en Barcos:</strong> Caballos, burros y mulos pueden entrar en barcos.</li>
+                    <li><strong>Huevos en Fardos de Heno:</strong> Los huevos de gallina sobre heno intentarán eclosionar.</li>
+                    <li><strong>Conejos que se Reproducen Solos:</strong> Se reproducen automáticamente tras comer cultivos de zanahorias.</li>
+                    <li><strong>Gólem de Nieve Produce Nieve Polvo:</strong> Ahora producen nieve en polvo.</li>
+                    <li><strong>Anunciador de Comerciante Ambulante:</strong> Se envía un mensaje a todos cuando aparece.</li>
+                </ul>
+            </section>
+            
+            <!-- Sección Tool Trims -->
+            <section id="datapack-tool-trims" class="wiki-section">
+                <h2>🎨 Datapack: Diseños de Herramientas (Tool Trims)</h2>
+                <p>Ahora puedes aplicar diseños estéticos a tus armas y herramientas.</p>
+                <ul>
+                    <li><strong>Mesa de Herrería de Herramientas:</strong> Nuevo bloque crafteado con 2 lingotes de cobre y 4 tablones.</li>
+                    <li><strong>Plantillas de Diseño (4 nuevas):</strong>
+                        <ul>
+                            <li><strong>Lineal (Linear):</strong> En Ruinas de Pista y Minas Abandonadas.</li>
+                            <li><strong>Rieles (Tracks):</strong> En Puestos de Saqueadores y Mansiones.</li>
+                            <li><strong>Carga (Charge):</strong> En Ciudades Antiguas.</li>
+                            <li><strong>Escarcha (Frost):</strong> En Iglús.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Materiales para Diseños:</strong> Amatista, Cobre, Diamante, Esmeralda, Oro, Hierro, Lapislázuli, Netherita, Cuarzo y Redstone.</li>
+                    <li><strong>Nuevos Logros:</strong> "Herramientas Brillantes" y "Herramientas de Todos los Estilos".</li>
+                </ul>
+            </section>
+            
+            <!-- Sección Crops Love Rain -->
+            <section id="datapack-crops-rain" class="wiki-section">
+                <h2>🌧️ Datapack: Los Cultivos Aman la Lluvia</h2>
+                <ul>
+                    <li><strong>Crecimiento Acelerado:</strong> Los cultivos crecen mucho más rápido cuando está lloviendo.</li>
+                    <li><strong>Cultivos Afectados:</strong> Todos los cultivos en tierra, bambú, brotes de árboles y caña de azúcar.</li>
+                </ul>
+            </section>
+            
+            <!-- Sección Armor Trim Effects -->
+            <section id="datapack-armor-effects" class="wiki-section">
+                <h2>✨ Datapack: Efectos de Diseños de Armadura</h2>
+                <p>Equipar armaduras con diseños específicos otorga efectos que se acumulan por pieza.</p>
+                <ul>
+                    <li><strong>Amatista:</strong> +0.5 de Suerte.</li>
+                    <li><strong>Cobre:</strong> +0.75 de Alcance de Interacción.</li>
+                    <li><strong>Diamante:</strong> +1.5 Armadura y +0.5 Dureza.</li>
+                    <li><strong>Esmeralda:</strong> +1 nivel de Héroe de la Aldea.</li>
+                    <li><strong>Oro:</strong> +10% Velocidad de Minería.</li>
+                    <li><strong>Hierro:</strong> +5% Daño y +7.5% Velocidad de Ataque.</li>
+                    <li><strong>Lapislázuli:</strong> +25% más Experiencia de orbes.</li>
+                    <li><strong>Netherita:</strong> 10% reducción del tiempo en llamas.</li>
+                    <li><strong>Cuarzo:</strong> +1 Distancia de Caída Segura y 15% reducción de daño por caída.</li>
+                    <li><strong>Redstone:</strong> +5% Velocidad de Movimiento y +15% Velocidad al agacharse.</li>
+                    <li><strong>Resina:</strong> +15% Resistencia al Empuje.</li>
+                </ul>
+            </section>
+            
+            <!-- Sección Pale Garden -->
+            <section id="datapack-pale-garden" class="wiki-section">
+                <h2>🌳 Datapack: El Jardín Pálido Remasterizado</h2>
+                <p>Este datapack renueva el bioma del Jardín Pálido para hacerlo un lugar verdaderamente aterrador.</p>
+                <ul>
+                    <li><strong>Bioma Mejorado:</strong> Árboles más altos y densos, con más bloques para mejorar la atmósfera.</li>
+                    <li><strong>Mob "The Creaking":</strong>
+                        <ul>
+                            <li>Mucho más difícil de combatir (más daño, vida y velocidad).</li>
+                            <li>Tres variantes: Bebé, Normal y Anciano.</li>
+                            <li>Puede invocar a más de su especie y suelta botín útil.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Ambiente Inmersivo:</strong>
+                        <ul>
+                            <li>Al entrar, comienza una tormenta y la niebla reduce la visibilidad.</li>
+                            <li>Sonidos ambientales espeluznantes.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Sección Fishing Loot -->
+            <section id="datapack-fishing-loot" class="wiki-section">
+                <h2>🎣 Datapack: Botín de Pesca Específico por Bioma</h2>
+                <p>Lo que pescas ahora depende del bioma en el que te encuentres, añadiendo botín único y variado.</p>
+                <ul>
+                    <li><strong>Botín Único por Bioma:</strong> Tablas de botín específicas para Cuevas, Bosques Oscuros, Deep Dark, Desiertos, End, Junglas, Montañas, Pantanos, etc.</li>
+                </ul>
+            </section>
+            
+            <!-- Sección Useful Animals -->
+            <section id="datapack-useful-animals" class="wiki-section">
+                <h2>🐖 Datapack: Animales Útiles</h2>
+                <p>Mejoras para varios animales pasivos.</p>
+                <ul>
+                    <li><strong>Cerdos Útiles:</strong> Tienen 2 crías. Si les lanzas una zanahoria dorada mientras los montas, olfatean objetos cercanos.</li>
+                    <li><strong>Murciélagos Útiles:</strong> Lanzarles una baya luminosa hará que iluminen a un mob cercano.</li>
+                    <li><strong>Osos Polares Útiles:</strong> Lanzarles salmón crudo da Fuerza a los jugadores cercanos.</li>
+                    <li><strong>Calamares Útiles:</strong> Sacos de tinta brillante craftean flechas espectrales. La tinta causa ceguera (normal) o visión nocturna (brillante).</li>
+                </ul>
+            </section>
+            
+            <!-- Sección Allay Upgrades -->
+            <section id="datapack-allay-upgrades" class="wiki-section">
+                <h2>💎 Datapack: Mejoras de Allays</h2>
+                <ul>
+                    <li><strong>Recuerdan Bloques de Notas:</strong> No olvidan su bloque asignado. Con un bloque de amatista debajo, lo recuerdan permanentemente.</li>
+                    <li><strong>Teletransporte:</strong> Se teletransportan a su dueño si se alejan demasiado.</li>
+                    <li><strong>Almohadillas de Amatista:</strong> "Almacena" Allays sin domesticar sobre un bloque de amatista.</li>
+                    <li><strong>Desmontaje Automático:</strong> Se bajan de barcos/vagonetas para no quedarse atascados.</li>
+                    <li><strong>Libros de Allay:</strong> Guarda un Allay en un libro para transportarlo fácilmente.</li>
+                </ul>
+            </section>
+            
+            <!-- Sección Progressive Eyes -->
+            <section id="datapack-progressive-eyes" class="wiki-section">
+                <h2>👁️ Datapack: Ojos Progresivos de Ranold</h2>
+                <p>La receta del Ojo de Ender ahora requiere un viaje por el mundo.</p>
+                <ul>
+                    <li><strong>Nueva Receta para Ojo de Ender:</strong> Wind Charges, Blaze Powder, Echo Shard y Prismarine.</li>
+                </ul>
+            </section>
+            
+            <!-- Sección Wandering Illusioner -->
+            <section id="datapack-wandering-illusioner" class="wiki-section">
+                <h2>🎭 Datapack: Ilusionista Ambulante</h2>
+                <p>Existe la posibilidad de que el Comerciante Ambulante sea un Ilusionista disfrazado. Emite partículas de humo para detectarlo.</p>
+            </section>
+            
+            <!-- Sección Upgraded Mobs -->
+            <section id="datapack-upgraded-mobs" class="wiki-section">
+                <h2>👾 Datapack: Mobs Mejorados</h2>
+                <p>Los mobs son más desafiantes y tienen nuevos ataques.</p>
+                <ul>
+                    <li><strong>Zombies:</strong> Siempre rompen puertas. Se lanzan hacia el jugador.</li>
+                    <li><strong>Ahogados:</strong> Nadan más rápido y arrastran a los jugadores al fondo.</li>
+                    <li><strong>Guardianes Ancianos (Boss):</strong> 300 de vida, aplican efectos negativos, invocan mini-guardianes y se vuelven invisibles.</li>
+                    <li><strong>Evocadores (Mini-Boss):</strong> 150 de vida, regeneración, usan Tótem. Su ataque de colmillos viene en 3 oleadas.</li>
+                    <li><strong>Piglin Brutes:</strong> 75% resistencia al empuje. Lanzan a los jugadores por los aires.</li>
+                    <li><strong>Saqueadores:</strong> Disparan flechas de debilidad o cohetes. Algunos tienen Carga Rápida II.</li>
+                    <li><strong>Arañas:</strong> Se lanzan hacia los jugadores y los atrapan en telarañas temporales.</li>
+                    <li><strong>Brujas:</strong> 60 de vida. Sus pociones pueden ser persistentes o infligir ceguera.</li>
+                </ul>
+            </section>
+
+            <!-- Sección Coals to Gunpowder -->
+            <section id="datapack-coals-gunpowder" class="wiki-section">
+                <h2>🔥 Datapack: Carbón a Pólvora</h2>
+                <p>Puedes fundir carbón o carbón vegetal en un horno para obtener pólvora.</p>
+            </section>
+
+            <!-- Sección Mob Tweaks -->
+            <section id="datapack-mob-tweaks" class="wiki-section">
+                <h2>🐾 Datapack: Ajustes de Mobs Adicionales</h2>
+                <ul>
+                    <li><strong>Partículas de Curación:</strong> Los Allays muestran corazones al curarse.</li>
+                    <li><strong>Reproducción Mejorada:</strong> Mobs en "modo amor" obtienen Regeneración 5.</li>
+                    <li><strong>Ravagers Resistentes:</strong> Inmunes a daño por caída y ahogamiento.</li>
+                    <li><strong>Quitar Sillas de Montar:</strong> Agachado y con mano vacía en cerdos y striders.</li>
+                    <li><strong>Leche de Camello:</strong> Da 30 segundos de Prisa (Haste).</li>
+                    <li><strong>Aldeanos Zombis Resistentes al Sol:</strong> Ciertas profesiones y variantes de bioma no se queman.</li>
+                    <li><strong>Ilusionistas en Puestos y Raids:</strong> Pueden aparecer en Puestos y durante incursiones.</li>
+                    <li><strong>Tótem de Resurrección:</strong> Lo sueltan Piglin Brutes. Se activa con el efecto Wither.</li>
+                    <li><strong>Conversión de Vex/Allay:</strong> Un Vex golpeado por un rayo se convierte en Allay y viceversa.</li>
+                    <li><strong>Strays Resistentes al Sol:</strong> Ya no se queman bajo la luz solar.</li>
+                </ul>
+            </section>
+
+            <!-- Sección Custom Arrows -->
+            <section id="datapack-custom-arrows" class="wiki-section">
+                <h2>🏹 Datapack: Flechas y Arcos Personalizados</h2>
+                <p>Craftea variantes únicas de flechas y arcos usando diferentes materiales.</p>
+                <h3>Flechas</h3>
+                <p>Reemplaza el sílex (flint) en la receta de la flecha.</p>
+                <ul>
+                    <li><strong>Flecha de Slime (Bola de Slime):</strong> Rebota en bloques.</li>
+                    <li><strong>Flecha de Hierro (Pepita de Hierro):</strong> Más lenta, pero más daño.</li>
+                    <li><strong>Flecha de Oro (Pepita de Oro):</strong> Más precisa, sin desviación.</li>
+                    <li><strong>Flecha Antorcha (Antorcha):</strong> Ilumina el área al volar.</li>
+                    <li><strong>Flecha de Prismarina (Fragmento de Prismarina):</strong> Vuela bajo el agua como en el aire.</li>
+                    <li><strong>Flecha de Amatista (Fragmento de Amatista):</strong> Más rápida y viaja más lejos.</li>
+                    <li><strong>Flecha de Eco (Fragmento de Eco):</strong> Sigue al mob más cercano (teledirigida).</li>
+                </ul>
+                <h3>Arcos</h3>
+                <p>Reemplaza los palos en la receta del arco.</p>
+                <ul>
+                    <li><strong>Arco Sollozante/Retorcido:</strong> Cosmético. Crafteado con enredaderas.</li>
+                    <li><strong>Arco de Hueso (Huesos y Cuero):</strong> Más durabilidad.</li>
+                    <li><strong>Arco de Viento (Varas de Brisa):</strong> Efecto de ráfaga de viento en golpe crítico.</li>
+                    <li><strong>Arco de Poder de Élite (Lingotes de Cobre):</strong> Siempre causa golpe crítico.</li>
+                    <li><strong>Arco del Vacío (Varas del End y Ojo de Ender):</strong> Teletransporta al objetivo en golpe crítico.</li>
+                </ul>
+            </section>
+
+        </main>
+    </div>
+  <script>
+        // Seleccionamos todos los botones que activan el despliegue
+        const collapsibles = document.querySelectorAll(".collapsible-trigger");
+
+        // Añadimos un detector de "clic" a cada uno
+        collapsibles.forEach(button => {
+            button.addEventListener("click", function() {
+                // Alternamos la clase 'active' en el botón para cambiar el icono (▼/▲)
+                this.classList.toggle("active");
+
+                // Seleccionamos el panel de contenido que está justo después del botón
+                const content = this.nextElementSibling;
+
+                // Si el panel ya está abierto (tiene un max-height), lo cerramos
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                } else {
+                    // Si está cerrado, lo abrimos estableciendo el max-height a su altura real
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }
+            });
+        });
+    </script>
+</body>
+</html>
